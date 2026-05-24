@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 const AUTH_STORAGE_KEY = 'admin-auth'
+const FALLBACK_ADMIN_USERNAME = 'admin'
+const FALLBACK_ADMIN_PASSWORD = 'vgr123'
 
 export default function LoginPage(){
   const router = useRouter()
@@ -23,14 +25,10 @@ export default function LoginPage(){
     setError('')
     setIsSubmitting(true)
 
-    const adminUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD
-
-    if(!adminUsername || !adminPassword){
-      setError('Admin login is not configured.')
-      setIsSubmitting(false)
-      return
-    }
+    const adminUsername =
+      process.env.NEXT_PUBLIC_ADMIN_USERNAME || FALLBACK_ADMIN_USERNAME
+    const adminPassword =
+      process.env.NEXT_PUBLIC_ADMIN_PASSWORD || FALLBACK_ADMIN_PASSWORD
 
     if(
       username.trim() === adminUsername &&
