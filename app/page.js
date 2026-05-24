@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { supabase } from '../lib/supabase'
 
 export default function Home() {
@@ -432,6 +433,18 @@ export default function Home() {
 
       </section>
 
+      <footer style={footerStyle}>
+        <div>
+          <strong style={footerBrandStyle}>ConsultPro</strong>
+          <p style={footerTextStyle}>
+            Expert consulting sessions, booked online.
+          </p>
+        </div>
+        <Link href="/contact" style={footerLinkStyle}>
+          Contact Us
+        </Link>
+      </footer>
+
     </main>
 
   )
@@ -443,6 +456,40 @@ const inputStyle = {
   borderRadius: '12px',
   border: '1px solid #d1d5db',
   fontSize: '15px'
+}
+
+const footerStyle = {
+  marginTop: '56px',
+  padding: '24px',
+  borderRadius: '18px',
+  background: '#111827',
+  color: '#ffffff',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: '18px',
+  flexWrap: 'wrap'
+}
+
+const footerBrandStyle = {
+  display: 'block',
+  fontSize: '20px',
+  marginBottom: '6px'
+}
+
+const footerTextStyle = {
+  color: '#d1d5db',
+  fontSize: '14px',
+  lineHeight: 1.5
+}
+
+const footerLinkStyle = {
+  color: '#ffffff',
+  textDecoration: 'none',
+  border: '1px solid rgba(255,255,255,0.28)',
+  borderRadius: '12px',
+  padding: '12px 16px',
+  fontWeight: 700
 }
 
 const modalOverlayStyle = {

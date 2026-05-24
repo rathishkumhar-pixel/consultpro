@@ -14,7 +14,13 @@ export default function Admin(){
     hero_title:'',
     hero_description:'',
     hero_button:'',
-    hero_image:''
+    hero_image:'',
+    contact_title:'',
+    contact_description:'',
+    contact_phone:'',
+    contact_email:'',
+    contact_address:'',
+    contact_hours:''
   })
   const [categories,setCategories] = useState([])
   const [newCategory,setNewCategory] = useState('')
@@ -78,7 +84,13 @@ export default function Admin(){
           hero_title:nextContent.hero_title,
           hero_description:nextContent.hero_description,
           hero_button:nextContent.hero_button,
-          hero_image:nextContent.hero_image
+          hero_image:nextContent.hero_image,
+          contact_title:nextContent.contact_title,
+          contact_description:nextContent.contact_description,
+          contact_phone:nextContent.contact_phone,
+          contact_email:nextContent.contact_email,
+          contact_address:nextContent.contact_address,
+          contact_hours:nextContent.contact_hours
         })
         .eq('id', existing[0].id)
     } else {
@@ -88,7 +100,13 @@ export default function Admin(){
           hero_title:nextContent.hero_title,
           hero_description:nextContent.hero_description,
           hero_button:nextContent.hero_button,
-          hero_image:nextContent.hero_image
+          hero_image:nextContent.hero_image,
+          contact_title:nextContent.contact_title,
+          contact_description:nextContent.contact_description,
+          contact_phone:nextContent.contact_phone,
+          contact_email:nextContent.contact_email,
+          contact_address:nextContent.contact_address,
+          contact_hours:nextContent.contact_hours
         })
     }
 
@@ -402,6 +420,127 @@ export default function Admin(){
             style={styles.primaryButton}
           >
             Save Content
+          </button>
+        </div>
+
+        <div style={styles.card}>
+          <div style={styles.cardHeader}>
+            <h2 style={styles.cardTitle}>Contact Page</h2>
+            <p style={styles.cardText}>
+              Update the footer contact page details.
+            </p>
+          </div>
+
+          <label style={styles.label} htmlFor="contact-title">
+            Contact title
+          </label>
+          <input
+            id="contact-title"
+            placeholder="Contact title"
+            value={content.contact_title || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                contact_title:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+
+          <label style={styles.label} htmlFor="contact-description">
+            Contact description
+          </label>
+          <textarea
+            id="contact-description"
+            placeholder="Contact description"
+            value={content.contact_description || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                contact_description:e.target.value
+              })
+            }
+            style={{
+              ...styles.input,
+              minHeight:'110px',
+              resize:'vertical'
+            }}
+          />
+
+          <label style={styles.label} htmlFor="contact-phone">
+            Phone
+          </label>
+          <input
+            id="contact-phone"
+            placeholder="Phone"
+            value={content.contact_phone || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                contact_phone:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+
+          <label style={styles.label} htmlFor="contact-email">
+            Email
+          </label>
+          <input
+            id="contact-email"
+            placeholder="Email"
+            value={content.contact_email || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                contact_email:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+
+          <label style={styles.label} htmlFor="contact-address">
+            Address
+          </label>
+          <textarea
+            id="contact-address"
+            placeholder="Address"
+            value={content.contact_address || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                contact_address:e.target.value
+              })
+            }
+            style={{
+              ...styles.input,
+              minHeight:'90px',
+              resize:'vertical'
+            }}
+          />
+
+          <label style={styles.label} htmlFor="contact-hours">
+            Business hours
+          </label>
+          <input
+            id="contact-hours"
+            placeholder="Business hours"
+            value={content.contact_hours || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                contact_hours:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+
+          <button
+            type="button"
+            onClick={saveContent}
+            style={styles.primaryButton}
+          >
+            Save Contact Page
           </button>
         </div>
 
