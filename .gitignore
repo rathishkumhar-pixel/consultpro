@@ -1,0 +1,58 @@
+<<<<<<< HEAD
+# dependencies
+node_modules/
+
+# next build
+.next/
+
+# production
+out/
+
+# env files
+.env.local
+.env
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# large files
+*.zip
+*.rar
+*.7z
+*.mp4
+*.mov
+*.avi
+*.psd
+*.fig
+
+# vercel
+.vercel/
+
+# coverage
+coverage/
+
+# cache
+.cache/
+
+# uploads
+public/uploads/
+
+# prevent files > 99MB
+*.iso
+*.tar
+*.gz
+
+=======
+largefile.zip
+mode modules/
+.next/
+dist/
+build/
+
+>>>>>>> 8ee6ab2e168819741b8f27f6cb9b0485c628751f

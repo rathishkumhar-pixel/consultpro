@@ -1,0 +1,4 @@
+node_modules
+.nect
+.env.local
+*.zip
