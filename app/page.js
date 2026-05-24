@@ -1,96 +1,188 @@
-
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-export default function Home(){
+export default function Home() {
 
-  const [form,setForm] = useState({
-    name:'',
-    phone:'',
-    category:'IT Career Advice',
-    booking_date:'',
-    slot:''
+  const [content, setContent] = useState(null)
+  const [categories, setCategories] = useState([])
+
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    category: '',
+    booking_date: '',
+    slot: ''
   })
 
-  async function bookNow(){
+  const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    loadContent()
+  }, [])
+
+  async function loadContent() {
+
+    const { data } = await supabase
+      .from('site_content')
+      .select('*')
+      .limit(1)
+      .single()
+
+    setContent(data)
+
+    const { data: categoryData } = await supabase
+      .from('categories')
+      .select('*')
+
+    setCategories(categoryData || [])
+  }
+
+  async function submitBooking() {
+
+    if (
+      !formData.name ||
+      !formData.phone ||
+      !formData.category ||
+      !formData.booking_date ||
+      !formData.slot
+    ) {
+      setMessage('Please fill all fields')
+      return
+    }
 
     const { error } = await supabase
       .from('bookings')
-      .insert([form])
+      .insert([formData])
 
-    if(error){
-      alert('Booking failed')
-    }else{
-      alert('Booking confirmed successfully')
+    if (error) {
+      setMessage('Booking failed')
+    } else {
+      setMessage('Booking successful')
+
+      setFormData({
+        name: '',
+        phone: '',
+        category: '',
+        booking_date: '',
+        slot: ''
+      })
     }
   }
 
-  return(
-    <div>
+  return (
 
-      <div className="navbar">
-        <h2>ConsultPro</h2>
-        <div>☰</div>
-      </div>
+    <main
+      style={{
+        minHeight: '100vh',
+        background: '#f5f7fb',
+        padding: '20px',
+        fontFamily: 'Arial'
+      }}
+    >
 
-      <section className="hero">
+      {/* HERO SECTION */}
 
-        <div>
-          <span style={{background:'#1e40af',padding:'8px 14px',borderRadius:'999px'}}>
-            #1 Consulting Platform
-          </span>
+      <section
+        style={{
+          textAlign: 'center',
+          padding: '60px 20px'
+        }}
+      >
 
-          <h1>
-            Get Expert Advice.
-            Achieve Your Goals.
-          </h1>
+        <h1
+          style={{
+            fontSize: '42px',
+            marginBottom: '20px',
+            color: '#111827'
+          }}
+        >
+          {content?.hero_title || 'ConsultPro'}
+        </h1>
 
-          <p>
-            Book one-on-one consultation sessions with verified experts.
-          </p>
+        <p
+          style={{
+            maxWidth: '700px',
+            margin: 'auto',
+            color: '#6b7280',
+            fontSize: '18px',
+            lineHeight: '1.6'
+          }}
+        >
+          {content?.hero_description}
+        </p>
 
-          <button className="btn-primary">
-            Explore Categories
-          </button>
-        </div>
-
-        <div>
-          <img
-            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1200"
-          />
-        </div>
+        <button
+          style={{
+            marginTop: '30px',
+            background: '#2563eb',
+            color: 'white',
+            border: 'none',
+            padding: '14px 24px',
+            borderRadius: '12px',
+            fontSize: '16px',
+            cursor: 'pointer'
+          }}
+        >
+          {content?.hero_button || 'Book Now'}
+        </button>
 
       </section>
 
-      <section className="section">
+      {/* CATEGORIES */}
 
-        <h2 className="section-title">
-          Popular Categories
+      <section
+        style={{
+          marginTop: '40px'
+        }}
+      >
+
+        <h2
+          style={{
+            marginBottom: '20px',
+            color: '#111827'
+          }}
+        >
+          Consultation Categories
         </h2>
 
-        <div className="grid">
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))',
+            gap: '20px'
+          }}
+        >
 
-          {[
-            'IT Career Advice',
-            'Stocks Guidance',
-            'Business Ideas',
-            'Car Buying Advice',
-            'Sports Consulting',
-            'General Consulting'
-          ].map((item)=>(
+          {categories.map((item) => (
 
-            <div className="card" key={item}>
-              <h3>{item}</h3>
+            <div
+              key={item.id}
+              style={{
+                background: 'white',
+                borderRadius: '16px',
+                padding: '24px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+              }}
+            >
 
-              <p>
-                Expert guidance and personalized consultation.
+              <h3
+                style={{
+                  marginBottom: '10px'
+                }}
+              >
+                {item.icon} {item.title}
+              </h3>
+
+              <p
+                style={{
+                  color: '#6b7280'
+                }}
+              >
+                {item.description}
               </p>
 
-              <div className="price">
-                ₹999 / 30 mins
-              </div>
             </div>
 
           ))}
@@ -99,99 +191,167 @@ export default function Home(){
 
       </section>
 
-      <section className="section">
+      {/* BOOKING FORM */}
 
-        <div className="booking-box">
+      <section
+        style={{
+          marginTop: '60px',
+          background: 'white',
+          padding: '30px',
+          borderRadius: '20px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+        }}
+      >
 
-          <h2 className="section-title">
-            Book Consultation
-          </h2>
+        <h2
+          style={{
+            marginBottom: '20px'
+          }}
+        >
+          Book Consultation
+        </h2>
+
+        <div
+          style={{
+            display: 'grid',
+            gap: '16px'
+          }}
+        >
 
           <input
+            type="text"
             placeholder="Full Name"
-            onChange={(e)=>setForm({...form,name:e.target.value})}
+            value={formData.name}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                name: e.target.value
+              })
+            }
+            style={inputStyle}
           />
 
           <input
+            type="text"
             placeholder="Phone Number"
-            onChange={(e)=>setForm({...form,phone:e.target.value})}
+            value={formData.phone}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                phone: e.target.value
+              })
+            }
+            style={inputStyle}
           />
 
           <select
-            onChange={(e)=>setForm({...form,category:e.target.value})}
+            value={formData.category}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                category: e.target.value
+              })
+            }
+            style={inputStyle}
           >
-            <option>IT Career Advice</option>
-            <option>Stocks Guidance</option>
-            <option>Business Ideas</option>
-            <option>Sports Consulting</option>
+
+            <option value="">
+              Select Category
+            </option>
+
+            {categories.map((item) => (
+              <option
+                key={item.id}
+                value={item.title}
+              >
+                {item.title}
+              </option>
+            ))}
+
           </select>
 
           <input
             type="date"
-            onChange={(e)=>setForm({...form,booking_date:e.target.value})}
+            value={formData.booking_date}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                booking_date: e.target.value
+              })
+            }
+            style={inputStyle}
           />
 
           <select
-            onChange={(e)=>setForm({...form,slot:e.target.value})}
+            value={formData.slot}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                slot: e.target.value
+              })
+            }
+            style={inputStyle}
           >
-            <option>Select Slot</option>
+
+            <option value="">
+              Select Time Slot
+            </option>
+
+            <option>09:00 AM</option>
+            <option>09:30 AM</option>
             <option>10:00 AM</option>
             <option>10:30 AM</option>
             <option>11:00 AM</option>
             <option>11:30 AM</option>
+            <option>12:00 PM</option>
+            <option>12:30 PM</option>
+            <option>01:00 PM</option>
+            <option>01:30 PM</option>
+            <option>02:00 PM</option>
+            <option>02:30 PM</option>
+            <option>03:00 PM</option>
+            <option>03:30 PM</option>
+            <option>04:00 PM</option>
+            <option>04:30 PM</option>
+
           </select>
 
-          <textarea
-            rows="5"
-            placeholder="Your question or notes"
-          ></textarea>
-
           <button
-            className="btn-primary"
-            onClick={bookNow}
+            onClick={submitBooking}
+            style={{
+              background: '#2563eb',
+              color: 'white',
+              border: 'none',
+              padding: '16px',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              fontSize: '16px'
+            }}
           >
             Confirm Booking
           </button>
 
-        </div>
-
-      </section>
-
-      <section className="section">
-
-        <div className="stats">
-
-          <div className="stat-card">
-            <h2>2500+</h2>
-            <p>Happy Clients</p>
-          </div>
-
-          <div className="stat-card">
-            <h2>50+</h2>
-            <p>Experts</p>
-          </div>
-
-          <div className="stat-card">
-            <h2>10+</h2>
-            <p>Categories</p>
-          </div>
-
-          <div className="stat-card">
-            <h2>4.9/5</h2>
-            <p>Ratings</p>
-          </div>
+          <p
+            style={{
+              color: '#16a34a'
+            }}
+          >
+            {message}
+          </p>
 
         </div>
 
       </section>
 
-      <div className="bottom-nav">
-        <div>🏠 Home</div>
-        <div>📂 Categories</div>
-        <div>📅 Bookings</div>
-        <div>👤 Profile</div>
-      </div>
+    </main>
 
-    </div>
   )
+}
+
+const inputStyle = {
+  width: '100%',
+  padding: '14px',
+  borderRadius: '12px',
+  border: '1px solid #d1d5db',
+  fontSize: '15px'
 }

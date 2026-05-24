@@ -55,4 +55,6 @@ mode modules/
 dist/
 build/
 
+.vs
+
 >>>>>>> 8ee6ab2e168819741b8f27f6cb9b0485c628751f
