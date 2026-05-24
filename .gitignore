@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # dependencies
 node_modules/
 
@@ -7,8 +6,10 @@ node_modules/
 
 # production
 out/
+dist/
+build/
 
-# env files
+# environment files
 .env.local
 .env
 
@@ -17,11 +18,22 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# OS files
+# OS and editor files
 .DS_Store
 Thumbs.db
+.vs/
 
-# large files
+# vercel
+.vercel/
+
+# coverage and cache
+coverage/
+.cache/
+
+# uploads
+public/uploads/
+
+# archives and large generated files
 *.zip
 *.rar
 *.7z
@@ -30,31 +42,6 @@ Thumbs.db
 *.avi
 *.psd
 *.fig
-
-# vercel
-.vercel/
-
-# coverage
-coverage/
-
-# cache
-.cache/
-
-# uploads
-public/uploads/
-
-# prevent files > 99MB
 *.iso
 *.tar
 *.gz
-
-=======
-largefile.zip
-mode modules/
-.next/
-dist/
-build/
-
-.vs
-
->>>>>>> 8ee6ab2e168819741b8f27f6cb9b0485c628751f
