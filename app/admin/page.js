@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 
@@ -308,13 +309,19 @@ export default function Admin(){
           <h1 style={styles.title}>ConsultPro CMS</h1>
         </div>
 
-        <button
-          type="button"
-          onClick={logout}
-          style={styles.logoutButton}
-        >
-          Logout
-        </button>
+        <div style={styles.headerActions}>
+          <Link href="/admin/bookings" style={styles.navButton}>
+            View Bookings
+          </Link>
+
+          <button
+            type="button"
+            onClick={logout}
+            style={styles.logoutButton}
+          >
+            Logout
+          </button>
+        </div>
       </header>
 
       <section style={styles.grid}>
@@ -797,6 +804,25 @@ const styles = {
     color:'#0f172a',
     fontWeight:800,
     cursor:'pointer'
+  },
+  headerActions:{
+    display:'flex',
+    alignItems:'center',
+    gap:'10px',
+    flexWrap:'wrap'
+  },
+  navButton:{
+    minHeight:'44px',
+    display:'inline-flex',
+    alignItems:'center',
+    justifyContent:'center',
+    padding:'0 18px',
+    border:'none',
+    borderRadius:'12px',
+    background:'#2563eb',
+    color:'#ffffff',
+    fontWeight:800,
+    textDecoration:'none'
   },
   grid:{
     width:'100%',
