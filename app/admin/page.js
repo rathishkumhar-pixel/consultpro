@@ -16,6 +16,29 @@ export default function Admin(){
     hero_description:'',
     hero_button:'',
     hero_image:'',
+    hero_eyebrow:'',
+    hero_secondary_button:'',
+    hero_illustration:'',
+    hero_image_alt:'',
+    trust_badges:'[]',
+    why_title:'',
+    features_json:'[]',
+    services_title:'',
+    services_json:'[]',
+    categories_title:'',
+    steps_title:'',
+    steps_json:'[]',
+    testimonials_title:'',
+    faq_title:'',
+    faqs_json:'[]',
+    booking_eyebrow:'',
+    booking_title:'',
+    booking_description:'',
+    cta_title:'',
+    cta_description:'',
+    cta_button:'',
+    footer_brand:'',
+    footer_description:'',
     contact_title:'',
     contact_description:'',
     contact_phone:'',
@@ -24,7 +47,14 @@ export default function Admin(){
     contact_hours:''
   })
   const [categories,setCategories] = useState([])
+  const [testimonials,setTestimonials] = useState([])
   const [newCategory,setNewCategory] = useState('')
+  const [newTestimonial,setNewTestimonial] = useState({
+    customer_name:'',
+    location:'',
+    review:'',
+    rating:'5'
+  })
   const [message,setMessage] = useState('')
 
   useEffect(()=>{
@@ -64,6 +94,13 @@ export default function Admin(){
       .select('*')
 
     setCategories(categoryData || [])
+
+    const { data:testimonialData } = await supabase
+      .from('testimonials')
+      .select('*')
+      .order('created_at',{ ascending:false })
+
+    setTestimonials(testimonialData || [])
   }
 
   async function saveContent(){
@@ -86,6 +123,29 @@ export default function Admin(){
           hero_description:nextContent.hero_description,
           hero_button:nextContent.hero_button,
           hero_image:nextContent.hero_image,
+          hero_eyebrow:nextContent.hero_eyebrow,
+          hero_secondary_button:nextContent.hero_secondary_button,
+          hero_illustration:nextContent.hero_illustration,
+          hero_image_alt:nextContent.hero_image_alt,
+          trust_badges:normalizeJsonField(nextContent.trust_badges),
+          why_title:nextContent.why_title,
+          features_json:normalizeJsonField(nextContent.features_json),
+          services_title:nextContent.services_title,
+          services_json:normalizeJsonField(nextContent.services_json),
+          categories_title:nextContent.categories_title,
+          steps_title:nextContent.steps_title,
+          steps_json:normalizeJsonField(nextContent.steps_json),
+          testimonials_title:nextContent.testimonials_title,
+          faq_title:nextContent.faq_title,
+          faqs_json:normalizeJsonField(nextContent.faqs_json),
+          booking_eyebrow:nextContent.booking_eyebrow,
+          booking_title:nextContent.booking_title,
+          booking_description:nextContent.booking_description,
+          cta_title:nextContent.cta_title,
+          cta_description:nextContent.cta_description,
+          cta_button:nextContent.cta_button,
+          footer_brand:nextContent.footer_brand,
+          footer_description:nextContent.footer_description,
           contact_title:nextContent.contact_title,
           contact_description:nextContent.contact_description,
           contact_phone:nextContent.contact_phone,
@@ -102,6 +162,29 @@ export default function Admin(){
           hero_description:nextContent.hero_description,
           hero_button:nextContent.hero_button,
           hero_image:nextContent.hero_image,
+          hero_eyebrow:nextContent.hero_eyebrow,
+          hero_secondary_button:nextContent.hero_secondary_button,
+          hero_illustration:nextContent.hero_illustration,
+          hero_image_alt:nextContent.hero_image_alt,
+          trust_badges:normalizeJsonField(nextContent.trust_badges),
+          why_title:nextContent.why_title,
+          features_json:normalizeJsonField(nextContent.features_json),
+          services_title:nextContent.services_title,
+          services_json:normalizeJsonField(nextContent.services_json),
+          categories_title:nextContent.categories_title,
+          steps_title:nextContent.steps_title,
+          steps_json:normalizeJsonField(nextContent.steps_json),
+          testimonials_title:nextContent.testimonials_title,
+          faq_title:nextContent.faq_title,
+          faqs_json:normalizeJsonField(nextContent.faqs_json),
+          booking_eyebrow:nextContent.booking_eyebrow,
+          booking_title:nextContent.booking_title,
+          booking_description:nextContent.booking_description,
+          cta_title:nextContent.cta_title,
+          cta_description:nextContent.cta_description,
+          cta_button:nextContent.cta_button,
+          footer_brand:nextContent.footer_brand,
+          footer_description:nextContent.footer_description,
           contact_title:nextContent.contact_title,
           contact_description:nextContent.contact_description,
           contact_phone:nextContent.contact_phone,
@@ -215,7 +298,82 @@ export default function Admin(){
     setMessage('Category image removed. Save category to publish it.')
   }
 
+  async function addTestimonial(){
+    if(
+      !newTestimonial.customer_name.trim() ||
+      !newTestimonial.location.trim() ||
+      !newTestimonial.review.trim()
+    ){
+      setMessage('Please fill all testimonial fields')
+      return
+    }
+
+    const { error } = await supabase
+      .from('testimonials')
+      .insert({
+        customer_name:newTestimonial.customer_name.trim(),
+        location:newTestimonial.location.trim(),
+        review:newTestimonial.review.trim(),
+        rating:Number(newTestimonial.rating || 5),
+        is_active:true
+      })
+
+    if(error){
+      setMessage(`Testimonial add failed: ${error.message}`)
+      return
+    }
+
+    setNewTestimonial({
+      customer_name:'',
+      location:'',
+      review:'',
+      rating:'5'
+    })
+    setMessage('Testimonial added')
+    loadData()
+  }
+
+  async function toggleTestimonial(testimonial){
+    const { error } = await supabase
+      .from('testimonials')
+      .update({
+        is_active:!testimonial.is_active
+      })
+      .eq('id',testimonial.id)
+
+    if(error){
+      setMessage(`Testimonial update failed: ${error.message}`)
+      return
+    }
+
+    setMessage('Testimonial updated')
+    loadData()
+  }
+
+  async function deleteTestimonial(testimonialId){
+    const { error } = await supabase
+      .from('testimonials')
+      .delete()
+      .eq('id',testimonialId)
+
+    if(error){
+      setMessage(`Testimonial delete failed: ${error.message}`)
+      return
+    }
+
+    setMessage('Testimonial deleted')
+    loadData()
+  }
+
   function uploadHeroImage(event){
+    uploadContentImage(event,'hero_image','Hero banner image published to homepage')
+  }
+
+  function uploadHeroIllustration(event){
+    uploadContentImage(event,'hero_illustration','Hero illustration published to homepage')
+  }
+
+  function uploadContentImage(event,fieldName,successMessage){
     const file = event.target.files?.[0]
 
     if(!file){
@@ -237,15 +395,15 @@ export default function Admin(){
     reader.onload = async ()=>{
       const nextContent = {
         ...content,
-        hero_image:reader.result
+        [fieldName]:reader.result
       }
 
       setContent(nextContent)
-      setMessage('Publishing hero image...')
+      setMessage('Publishing image...')
 
       await persistContent(
         nextContent,
-        'Hero image published to homepage'
+        successMessage
       )
     }
 
@@ -268,6 +426,21 @@ export default function Admin(){
     await persistContent(
       nextContent,
       'Hero image removed from homepage'
+    )
+  }
+
+  async function removeHeroIllustration(){
+    const nextContent = {
+      ...content,
+      hero_illustration:''
+    }
+
+    setContent(nextContent)
+    setMessage('Removing hero illustration...')
+
+    await persistContent(
+      nextContent,
+      'Hero illustration removed from homepage'
     )
   }
 
@@ -337,6 +510,18 @@ export default function Admin(){
             Hero title
           </label>
           <input
+            id="hero-eyebrow"
+            placeholder="Hero eyebrow"
+            value={content.hero_eyebrow || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                hero_eyebrow:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+          <input
             id="hero-title"
             placeholder="Hero title"
             value={content.hero_title || ''}
@@ -385,6 +570,18 @@ export default function Admin(){
             style={styles.input}
           />
 
+          <input
+            placeholder="Secondary button text"
+            value={content.hero_secondary_button || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                hero_secondary_button:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+
           <label style={styles.label} htmlFor="hero-image">
             Hero banner image
           </label>
@@ -421,12 +618,329 @@ export default function Admin(){
             </div>
           )}
 
+          <label style={styles.label} htmlFor="hero-illustration">
+            Hero illustration image
+          </label>
+          <label htmlFor="hero-illustration" style={styles.uploadBox}>
+            <span style={styles.uploadTitle}>
+              Upload right-side hero image
+            </span>
+            <span style={styles.uploadText}>
+              JPG, PNG, or WebP under 2MB
+            </span>
+          </label>
+          <input
+            id="hero-illustration"
+            type="file"
+            accept="image/*"
+            onChange={uploadHeroIllustration}
+            style={styles.fileInput}
+          />
+
+          {content.hero_illustration && (
+            <div style={styles.previewWrap}>
+              <img
+                src={content.hero_illustration}
+                alt="Hero illustration preview"
+                style={styles.previewImage}
+              />
+              <button
+                type="button"
+                onClick={removeHeroIllustration}
+                style={styles.secondaryButton}
+              >
+                Remove Illustration
+              </button>
+            </div>
+          )}
+
+          <input
+            placeholder="Hero image alt text"
+            value={content.hero_image_alt || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                hero_image_alt:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+
+          <JsonField
+            id="trust-badges"
+            label="Trust badges JSON"
+            value={content.trust_badges}
+            onChange={(value)=>
+              setContent({
+                ...content,
+                trust_badges:value
+              })
+            }
+          />
+
           <button
             type="button"
             onClick={saveContent}
             style={styles.primaryButton}
           >
             Save Content
+          </button>
+        </div>
+
+        <div style={styles.card}>
+          <div style={styles.cardHeader}>
+            <h2 style={styles.cardTitle}>Homepage Sections</h2>
+            <p style={styles.cardText}>
+              Configure homepage sections. Empty section titles or empty JSON arrays will hide those sections.
+            </p>
+          </div>
+
+          <label style={styles.label} htmlFor="why-title">
+            Why section title
+          </label>
+          <input
+            id="why-title"
+            value={content.why_title || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                why_title:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+          <JsonField
+            id="features-json"
+            label="Feature cards JSON"
+            value={content.features_json}
+            onChange={(value)=>
+              setContent({
+                ...content,
+                features_json:value
+              })
+            }
+          />
+
+          <label style={styles.label} htmlFor="services-title">
+            Services section title
+          </label>
+          <input
+            id="services-title"
+            value={content.services_title || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                services_title:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+          <JsonField
+            id="services-json"
+            label="Service cards JSON"
+            value={content.services_json}
+            onChange={(value)=>
+              setContent({
+                ...content,
+                services_json:value
+              })
+            }
+          />
+
+          <label style={styles.label} htmlFor="categories-title">
+            Categories section title
+          </label>
+          <input
+            id="categories-title"
+            value={content.categories_title || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                categories_title:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+
+          <label style={styles.label} htmlFor="steps-title">
+            Timeline section title
+          </label>
+          <input
+            id="steps-title"
+            value={content.steps_title || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                steps_title:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+          <JsonField
+            id="steps-json"
+            label="Timeline steps JSON"
+            value={content.steps_json}
+            onChange={(value)=>
+              setContent({
+                ...content,
+                steps_json:value
+              })
+            }
+          />
+
+          <label style={styles.label} htmlFor="testimonials-title">
+            Testimonials section title
+          </label>
+          <input
+            id="testimonials-title"
+            value={content.testimonials_title || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                testimonials_title:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+
+          <label style={styles.label} htmlFor="faq-title">
+            FAQ section title
+          </label>
+          <input
+            id="faq-title"
+            value={content.faq_title || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                faq_title:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+          <JsonField
+            id="faqs-json"
+            label="FAQ JSON"
+            value={content.faqs_json}
+            onChange={(value)=>
+              setContent({
+                ...content,
+                faqs_json:value
+              })
+            }
+          />
+
+          <label style={styles.label} htmlFor="booking-eyebrow">
+            Booking eyebrow
+          </label>
+          <input
+            id="booking-eyebrow"
+            value={content.booking_eyebrow || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                booking_eyebrow:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+          <input
+            placeholder="Booking title"
+            value={content.booking_title || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                booking_title:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+          <textarea
+            placeholder="Booking description"
+            value={content.booking_description || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                booking_description:e.target.value
+              })
+            }
+            style={{
+              ...styles.input,
+              minHeight:'90px',
+              resize:'vertical'
+            }}
+          />
+
+          <input
+            placeholder="CTA title"
+            value={content.cta_title || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                cta_title:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+          <textarea
+            placeholder="CTA description"
+            value={content.cta_description || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                cta_description:e.target.value
+              })
+            }
+            style={{
+              ...styles.input,
+              minHeight:'90px',
+              resize:'vertical'
+            }}
+          />
+          <input
+            placeholder="CTA button"
+            value={content.cta_button || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                cta_button:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+
+          <input
+            placeholder="Footer brand"
+            value={content.footer_brand || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                footer_brand:e.target.value
+              })
+            }
+            style={styles.input}
+          />
+          <textarea
+            placeholder="Footer description"
+            value={content.footer_description || ''}
+            onChange={(e)=>
+              setContent({
+                ...content,
+                footer_description:e.target.value
+              })
+            }
+            style={{
+              ...styles.input,
+              minHeight:'90px',
+              resize:'vertical'
+            }}
+          />
+
+          <button
+            type="button"
+            onClick={saveContent}
+            style={styles.primaryButton}
+          >
+            Save Homepage Sections
           </button>
         </div>
 
@@ -727,6 +1241,130 @@ export default function Admin(){
             )}
           </div>
         </div>
+
+        <div style={styles.card}>
+          <div style={styles.cardHeader}>
+            <h2 style={styles.cardTitle}>Testimonials</h2>
+            <p style={styles.cardText}>
+              Add customer reviews shown in the homepage carousel.
+            </p>
+          </div>
+
+          <label style={styles.label} htmlFor="testimonial-name">
+            Customer name
+          </label>
+          <input
+            id="testimonial-name"
+            value={newTestimonial.customer_name}
+            onChange={(event)=>
+              setNewTestimonial({
+                ...newTestimonial,
+                customer_name:event.target.value
+              })
+            }
+            style={styles.input}
+          />
+
+          <label style={styles.label} htmlFor="testimonial-location">
+            Location
+          </label>
+          <input
+            id="testimonial-location"
+            value={newTestimonial.location}
+            onChange={(event)=>
+              setNewTestimonial({
+                ...newTestimonial,
+                location:event.target.value
+              })
+            }
+            style={styles.input}
+          />
+
+          <label style={styles.label} htmlFor="testimonial-review">
+            Review
+          </label>
+          <textarea
+            id="testimonial-review"
+            value={newTestimonial.review}
+            onChange={(event)=>
+              setNewTestimonial({
+                ...newTestimonial,
+                review:event.target.value
+              })
+            }
+            style={{
+              ...styles.input,
+              minHeight:'110px',
+              resize:'vertical'
+            }}
+          />
+
+          <label style={styles.label} htmlFor="testimonial-rating">
+            Rating
+          </label>
+          <select
+            id="testimonial-rating"
+            value={newTestimonial.rating}
+            onChange={(event)=>
+              setNewTestimonial({
+                ...newTestimonial,
+                rating:event.target.value
+              })
+            }
+            style={styles.input}
+          >
+            <option value="5">5 stars</option>
+            <option value="4">4 stars</option>
+            <option value="3">3 stars</option>
+            <option value="2">2 stars</option>
+            <option value="1">1 star</option>
+          </select>
+
+          <button
+            type="button"
+            onClick={addTestimonial}
+            style={styles.primaryButton}
+          >
+            Add Testimonial
+          </button>
+
+          <div style={styles.categoryList}>
+            {testimonials.length === 0 ? (
+              <p style={styles.emptyText}>No testimonials yet.</p>
+            ) : (
+              testimonials.map((testimonial)=>(
+                <div key={testimonial.id} style={styles.categoryEditor}>
+                  <div style={styles.categoryEditorHeader}>
+                    <strong>{testimonial.customer_name}</strong>
+                    <span style={styles.testimonialStatus}>
+                      {testimonial.is_active ? 'Active' : 'Hidden'}
+                    </span>
+                  </div>
+                  <p style={styles.cardText}>{testimonial.review}</p>
+                  <p style={styles.emptyText}>
+                    {testimonial.location} · {testimonial.rating || 5} stars
+                  </p>
+                  <div style={styles.rowActions}>
+                    <button
+                      type="button"
+                      onClick={()=>toggleTestimonial(testimonial)}
+                      style={styles.secondaryButton}
+                    >
+                      {testimonial.is_active ? 'Hide' : 'Show'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={()=>deleteTestimonial(testimonial.id)}
+                      style={styles.dangerButton}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </section>
 
       {message && (
@@ -736,6 +1374,65 @@ export default function Admin(){
       )}
     </main>
   )
+}
+
+function JsonField({ id,label,value,onChange }){
+  return(
+    <>
+      <label style={styles.label} htmlFor={id}>
+        {label}
+      </label>
+      <textarea
+        id={id}
+        value={formatJsonForEdit(value)}
+        onChange={(event)=>onChange(event.target.value)}
+        style={{
+          ...styles.input,
+          minHeight:'170px',
+          resize:'vertical',
+          fontFamily:'Consolas,monospace',
+          fontSize:'13px'
+        }}
+      />
+    </>
+  )
+}
+
+function formatJsonForEdit(value){
+  if(!value){
+    return '[]'
+  }
+
+  if(typeof value === 'string'){
+    try {
+      return JSON.stringify(JSON.parse(value),null,2)
+    } catch (_error) {
+      return value
+    }
+  }
+
+  return JSON.stringify(value,null,2)
+}
+
+function normalizeJsonField(value){
+  if(Array.isArray(value)){
+    return value
+  }
+
+  if(!value){
+    return []
+  }
+
+  if(typeof value !== 'string'){
+    return value
+  }
+
+  try {
+    const parsed = JSON.parse(value)
+    return Array.isArray(parsed) ? parsed : []
+  } catch (_error) {
+    return []
+  }
 }
 
 const styles = {
@@ -1001,5 +1698,31 @@ const styles = {
     border:'1px solid #bbf7d0',
     color:'#047857',
     fontWeight:800
+  },
+  rowActions:{
+    display:'grid',
+    gridTemplateColumns:'1fr 1fr',
+    gap:'10px',
+    marginTop:'14px'
+  },
+  dangerButton:{
+    width:'100%',
+    minHeight:'44px',
+    border:'1px solid #fecaca',
+    borderRadius:'12px',
+    background:'#fef2f2',
+    color:'#b91c1c',
+    fontSize:'14px',
+    fontWeight:800,
+    cursor:'pointer'
+  },
+  testimonialStatus:{
+    marginLeft:'auto',
+    padding:'6px 10px',
+    borderRadius:'999px',
+    background:'#dbeafe',
+    color:'#1d4ed8',
+    fontSize:'12px',
+    fontWeight:900
   }
 }

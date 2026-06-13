@@ -29,6 +29,7 @@ Thumbs.db
 # coverage and cache
 coverage/
 .cache/
+supabase/.temp/
 
 # uploads
 public/uploads/
