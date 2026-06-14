@@ -39,6 +39,9 @@ export default function Admin(){
     cta_button:'',
     footer_brand:'',
     footer_description:'',
+    seo_title:'',
+    seo_description:'',
+    seo_og_image:'',
     contact_title:'',
     contact_description:'',
     contact_phone:'',
@@ -146,6 +149,9 @@ export default function Admin(){
           cta_button:nextContent.cta_button,
           footer_brand:nextContent.footer_brand,
           footer_description:nextContent.footer_description,
+          seo_title:nextContent.seo_title,
+          seo_description:nextContent.seo_description,
+          seo_og_image:nextContent.seo_og_image,
           contact_title:nextContent.contact_title,
           contact_description:nextContent.contact_description,
           contact_phone:nextContent.contact_phone,
@@ -185,6 +191,9 @@ export default function Admin(){
           cta_button:nextContent.cta_button,
           footer_brand:nextContent.footer_brand,
           footer_description:nextContent.footer_description,
+          seo_title:nextContent.seo_title,
+          seo_description:nextContent.seo_description,
+          seo_og_image:nextContent.seo_og_image,
           contact_title:nextContent.contact_title,
           contact_description:nextContent.contact_description,
           contact_phone:nextContent.contact_phone,
@@ -373,6 +382,10 @@ export default function Admin(){
     uploadContentImage(event,'hero_illustration','Hero illustration published to homepage')
   }
 
+  function uploadSeoOgImage(event){
+    uploadContentImage(event,'seo_og_image','Open Graph image saved')
+  }
+
   function uploadContentImage(event,fieldName,successMessage){
     const file = event.target.files?.[0]
 
@@ -441,6 +454,21 @@ export default function Admin(){
     await persistContent(
       nextContent,
       'Hero illustration removed from homepage'
+    )
+  }
+
+  async function removeSeoOgImage(){
+    const nextContent = {
+      ...content,
+      seo_og_image:''
+    }
+
+    setContent(nextContent)
+    setMessage('Removing Open Graph image...')
+
+    await persistContent(
+      nextContent,
+      'Open Graph image removed'
     )
   }
 
@@ -684,6 +712,106 @@ export default function Admin(){
             style={styles.primaryButton}
           >
             Save Content
+          </button>
+        </div>
+
+        <div style={styles.card}>
+          <div style={styles.cardHeader}>
+            <h2 style={styles.cardTitle}>SEO</h2>
+            <p style={styles.cardText}>
+              Configure homepage search and social sharing metadata.
+            </p>
+          </div>
+
+          <label style={styles.label} htmlFor="seo-title">
+            Meta title
+          </label>
+          <input
+            id="seo-title"
+            placeholder="Meta title"
+            value={content.seo_title || ''}
+            onChange={(event)=>
+              setContent({
+                ...content,
+                seo_title:event.target.value
+              })
+            }
+            style={styles.input}
+          />
+
+          <label style={styles.label} htmlFor="seo-description">
+            Meta description
+          </label>
+          <textarea
+            id="seo-description"
+            placeholder="Meta description"
+            value={content.seo_description || ''}
+            onChange={(event)=>
+              setContent({
+                ...content,
+                seo_description:event.target.value
+              })
+            }
+            style={{
+              ...styles.input,
+              minHeight:'110px',
+              resize:'vertical'
+            }}
+          />
+
+          <label style={styles.label} htmlFor="seo-og-image">
+            Open Graph image
+          </label>
+          <input
+            placeholder="Open Graph image public URL"
+            value={content.seo_og_image || ''}
+            onChange={(event)=>
+              setContent({
+                ...content,
+                seo_og_image:event.target.value
+              })
+            }
+            style={styles.input}
+          />
+          <label htmlFor="seo-og-image" style={styles.uploadBox}>
+            <span style={styles.uploadTitle}>
+              Upload Open Graph image
+            </span>
+            <span style={styles.uploadText}>
+              Use a public URL for best social sharing support. Uploads are saved as image data.
+            </span>
+          </label>
+          <input
+            id="seo-og-image"
+            type="file"
+            accept="image/*"
+            onChange={uploadSeoOgImage}
+            style={styles.fileInput}
+          />
+
+          {content.seo_og_image && (
+            <div style={styles.previewWrap}>
+              <img
+                src={content.seo_og_image}
+                alt="Open Graph preview"
+                style={styles.previewImage}
+              />
+              <button
+                type="button"
+                onClick={removeSeoOgImage}
+                style={styles.secondaryButton}
+              >
+                Remove Open Graph Image
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={saveContent}
+            style={styles.primaryButton}
+          >
+            Save SEO
           </button>
         </div>
 
