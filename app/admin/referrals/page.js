@@ -7,11 +7,11 @@ import { supabase } from '../../../lib/supabase'
 
 const AUTH_STORAGE_KEY = 'admin-auth'
 
-export default function AdminBookingsPage(){
+export default function AdminReferralsPage(){
   const router = useRouter()
   const [isAuthorized,setIsAuthorized] = useState(false)
   const [isCheckingAuth,setIsCheckingAuth] = useState(true)
-  const [bookings,setBookings] = useState([])
+  const [referrals,setReferrals] = useState([])
   const [message,setMessage] = useState('')
   const [isLoading,setIsLoading] = useState(false)
 
@@ -32,67 +32,61 @@ export default function AdminBookingsPage(){
 
   useEffect(()=>{
     if(isAuthorized){
-      loadBookings()
+      loadReferrals()
     }
   },[isAuthorized])
 
-  const bookingCounts = useMemo(()=>{
-    const completed = bookings.filter((booking)=>booking.completed).length
+  const referralCounts = useMemo(()=>{
+    const completed = referrals.filter((referral)=>referral.status === 'Completed').length
 
     return {
-      total:bookings.length,
-      pending:bookings.length - completed,
+      total:referrals.length,
+      pending:referrals.length - completed,
       completed
     }
-  },[bookings])
+  },[referrals])
 
-  async function loadBookings(){
+  async function loadReferrals(){
     setIsLoading(true)
     setMessage('')
 
     const { data,error } = await supabase
-      .from('bookings')
+      .from('referrals')
       .select('*')
       .order('created_at',{ ascending:false })
 
     if(error){
-      setMessage(`Unable to load bookings: ${error.message}`)
-      setBookings([])
+      setMessage(`Unable to load referrals: ${error.message}`)
+      setReferrals([])
     } else {
-      setBookings(data || [])
+      setReferrals(data || [])
     }
 
     setIsLoading(false)
   }
 
-  async function markCompleted(bookingId){
+  async function updateStatus(referralId,status){
     setMessage('')
 
-    const { error } = await supabase
-      .from('bookings')
-      .update({
-        completed:true,
-        completed_at:new Date().toISOString()
+    const { data,error } = await supabase
+      .rpc('update_referral_status',{
+        p_referral_id:referralId,
+        p_status:status
       })
-      .eq('id',bookingId)
 
     if(error){
-      setMessage(`Unable to mark completed: ${error.message}`)
+      setMessage(`Unable to update referral: ${error.message}`)
       return
     }
 
-    setBookings((currentBookings)=>
-      currentBookings.map((booking)=>
-        booking.id === bookingId
-          ? {
-              ...booking,
-              completed:true,
-              completed_at:new Date().toISOString()
-            }
-          : booking
+    setReferrals((currentReferrals)=>
+      currentReferrals.map((referral)=>
+        referral.id === referralId
+          ? data
+          : referral
       )
     )
-    setMessage('Booking marked as completed')
+    setMessage(`Referral marked as ${status}`)
   }
 
   function logout(){
@@ -130,15 +124,15 @@ export default function AdminBookingsPage(){
       <header style={styles.header}>
         <div>
           <p style={styles.eyebrow}>Secure admin</p>
-          <h1 style={styles.title}>Bookings</h1>
+          <h1 style={styles.title}>Referrals</h1>
         </div>
 
         <div style={styles.headerActions}>
           <Link href="/admin" style={styles.secondaryLink}>
             CMS
           </Link>
-          <Link href="/admin/referrals" style={styles.secondaryLink}>
-            Referrals
+          <Link href="/admin/bookings" style={styles.secondaryLink}>
+            Bookings
           </Link>
           <button type="button" onClick={logout} style={styles.logoutButton}>
             Logout
@@ -149,28 +143,28 @@ export default function AdminBookingsPage(){
       <section style={styles.statsGrid}>
         <div style={styles.statCard}>
           <span style={styles.statLabel}>Total</span>
-          <strong style={styles.statValue}>{bookingCounts.total}</strong>
+          <strong style={styles.statValue}>{referralCounts.total}</strong>
         </div>
         <div style={styles.statCard}>
           <span style={styles.statLabel}>Pending</span>
-          <strong style={styles.statValue}>{bookingCounts.pending}</strong>
+          <strong style={styles.statValue}>{referralCounts.pending}</strong>
         </div>
         <div style={styles.statCard}>
           <span style={styles.statLabel}>Completed</span>
-          <strong style={styles.statValue}>{bookingCounts.completed}</strong>
+          <strong style={styles.statValue}>{referralCounts.completed}</strong>
         </div>
       </section>
 
       <section style={styles.panel}>
         <div style={styles.panelHeader}>
           <div>
-            <h2 style={styles.panelTitle}>Booking Requests</h2>
+            <h2 style={styles.panelTitle}>Referral Requests</h2>
             <p style={styles.panelText}>
-              Review consultation requests and mark completed sessions.
+              Review valid referral entries and manually control their status.
             </p>
           </div>
 
-          <button type="button" onClick={loadBookings} style={styles.refreshButton}>
+          <button type="button" onClick={loadReferrals} style={styles.refreshButton}>
             Refresh
           </button>
         </div>
@@ -182,52 +176,61 @@ export default function AdminBookingsPage(){
         )}
 
         {isLoading ? (
-          <div style={styles.emptyState}>Loading bookings...</div>
-        ) : bookings.length === 0 ? (
-          <div style={styles.emptyState}>No bookings yet.</div>
+          <div style={styles.emptyState}>Loading referrals...</div>
+        ) : referrals.length === 0 ? (
+          <div style={styles.emptyState}>No referrals yet.</div>
         ) : (
-          <div style={styles.bookingList}>
-            {bookings.map((booking)=>(
-              <article key={booking.id} style={styles.bookingCard}>
-                <div style={styles.bookingTop}>
+          <div style={styles.referralList}>
+            {referrals.map((referral)=>(
+              <article key={referral.id} style={styles.referralCard}>
+                <div style={styles.referralTop}>
                   <div>
                     <h3 style={styles.customerName}>
-                      {booking.name || 'Unnamed customer'}
+                      {referral.customer_name || 'Unnamed customer'}
                     </h3>
                     <p style={styles.createdAt}>
-                      Requested {formatDateTime(booking.created_at)}
+                      Created {formatDateTime(referral.created_at)}
                     </p>
                   </div>
 
                   <span
                     style={{
                       ...styles.statusPill,
-                      ...(booking.completed
+                      ...(referral.status === 'Completed'
                         ? styles.completedPill
                         : styles.pendingPill)
                     }}
                   >
-                    {booking.completed ? 'Completed' : 'Pending'}
+                    {referral.status}
                   </span>
                 </div>
 
                 <div style={styles.detailGrid}>
-                  <Detail label="Phone" value={booking.phone} />
-                  <Detail label="Service" value={booking.category} />
-                  <Detail label="Date" value={formatDate(booking.booking_date)} />
-                  <Detail label="Time" value={booking.slot} />
-                  <Detail label="Referred By" value={booking.referred_by_mobile} />
+                  <Detail label="Customer Phone" value={referral.referred_phone} />
+                  <Detail label="Referred By" value={referral.referrer_phone} />
+                  <Detail label="Service" value={referral.service_requested} />
+                  <Detail label="Date" value={formatDate(referral.booking_date)} />
+                  <Detail label="Time" value={referral.slot} />
+                  <Detail label="Booking ID" value={referral.booking_id} />
                 </div>
 
+                {referral.fraud_notes && (
+                  <p style={styles.warningText}>{referral.fraud_notes}</p>
+                )}
+
                 <div style={styles.cardActions}>
-                  {booking.completed ? (
-                    <span style={styles.completedText}>
-                      Completed {formatDateTime(booking.completed_at)}
-                    </span>
+                  {referral.status === 'Completed' ? (
+                    <button
+                      type="button"
+                      onClick={()=>updateStatus(referral.id,'Pending')}
+                      style={styles.secondaryButton}
+                    >
+                      Mark Pending
+                    </button>
                   ) : (
                     <button
                       type="button"
-                      onClick={()=>markCompleted(booking.id)}
+                      onClick={()=>updateStatus(referral.id,'Completed')}
                       style={styles.primaryButton}
                     >
                       Mark Completed
@@ -431,17 +434,17 @@ const styles = {
     fontWeight:800,
     cursor:'pointer'
   },
-  bookingList:{
+  referralList:{
     display:'grid',
     gap:'14px'
   },
-  bookingCard:{
+  referralCard:{
     border:'1px solid #e5e7eb',
     borderRadius:'16px',
     padding:'18px',
     background:'#f8fafc'
   },
-  bookingTop:{
+  referralTop:{
     display:'flex',
     alignItems:'flex-start',
     justifyContent:'space-between',
@@ -463,11 +466,10 @@ const styles = {
     alignItems:'center',
     justifyContent:'center',
     minHeight:'30px',
-    padding:'0 10px',
+    padding:'0 12px',
     borderRadius:'999px',
-    fontSize:'12px',
-    fontWeight:900,
-    whiteSpace:'nowrap'
+    fontSize:'13px',
+    fontWeight:800
   },
   pendingPill:{
     background:'#fef3c7',
@@ -479,7 +481,7 @@ const styles = {
   },
   detailGrid:{
     display:'grid',
-    gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',
+    gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',
     gap:'12px'
   },
   detailItem:{
@@ -499,54 +501,60 @@ const styles = {
   detailValue:{
     color:'#0f172a',
     fontSize:'15px',
-    lineHeight:1.4,
+    lineHeight:1.35,
     overflowWrap:'anywhere'
   },
+  warningText:{
+    marginTop:'14px',
+    padding:'12px',
+    borderRadius:'12px',
+    background:'#fff7ed',
+    color:'#9a3412',
+    fontWeight:700
+  },
   cardActions:{
-    marginTop:'16px',
     display:'flex',
-    justifyContent:'flex-end'
+    justifyContent:'flex-end',
+    gap:'10px',
+    flexWrap:'wrap',
+    marginTop:'16px'
   },
   primaryButton:{
-    minHeight:'44px',
+    minHeight:'42px',
     padding:'0 16px',
     border:'none',
     borderRadius:'12px',
     background:'#2563eb',
     color:'#ffffff',
-    fontSize:'14px',
     fontWeight:800,
     cursor:'pointer'
   },
-  completedText:{
-    color:'#166534',
-    fontSize:'14px',
-    fontWeight:800
+  secondaryButton:{
+    minHeight:'42px',
+    padding:'0 16px',
+    border:'1px solid #cbd5e1',
+    borderRadius:'12px',
+    background:'#ffffff',
+    color:'#0f172a',
+    fontWeight:800,
+    cursor:'pointer'
+  },
+  message:{
+    color:'#16a34a',
+    fontWeight:800,
+    marginBottom:'14px'
+  },
+  error:{
+    color:'#dc2626',
+    fontWeight:800,
+    marginBottom:'14px'
   },
   emptyState:{
-    padding:'28px',
+    padding:'24px',
     borderRadius:'14px',
     background:'#f8fafc',
     color:'#64748b',
     textAlign:'center',
-    fontWeight:800
-  },
-  message:{
-    margin:'0 0 16px',
-    padding:'14px 16px',
-    borderRadius:'12px',
-    background:'#ecfdf5',
-    border:'1px solid #bbf7d0',
-    color:'#047857',
-    fontWeight:800
-  },
-  error:{
-    margin:'0 0 16px',
-    padding:'14px 16px',
-    borderRadius:'12px',
-    background:'#fef2f2',
-    border:'1px solid #fecaca',
-    color:'#b91c1c',
     fontWeight:800
   }
 }

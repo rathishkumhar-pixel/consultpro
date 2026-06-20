@@ -12,19 +12,43 @@ export default function Home({
   const [content, setContent] = useState(initialContent)
   const [categories, setCategories] = useState(initialCategories)
   const [testimonials, setTestimonials] = useState(initialTestimonials)
-  const [selectedCategory, setSelectedCategory] = useState(null)
   const [openFaq, setOpenFaq] = useState(0)
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     category: '',
     booking_date: '',
-    slot: ''
+    slot: '',
+    referrer_phone: ''
   })
   const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState('success')
 
   useEffect(() => {
     loadContent()
+  }, [])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const category = params.get('category')
+
+    if(!category){
+      return
+    }
+
+    setFormData((current)=>({
+      ...current,
+      category
+    }))
+
+    window.requestAnimationFrame(()=>{
+      document
+        .getElementById('booking-form')
+        ?.scrollIntoView({
+          behavior:'smooth',
+          block:'start'
+        })
+    })
   }, [])
 
   async function loadContent() {
@@ -72,6 +96,9 @@ export default function Home({
   }
 
   async function submitBooking() {
+    setMessage('')
+    setMessageType('success')
+
     if (
       !formData.name.trim() ||
       !formData.phone.trim() ||
@@ -79,12 +106,29 @@ export default function Home({
       !formData.booking_date ||
       !formData.slot
     ) {
+      setMessageType('error')
       setMessage('Please fill all fields')
       return
     }
 
-    if (!/^[0-9]+$/.test(formData.phone)) {
-      setMessage('Phone number must contain only numbers')
+    const customerPhone = normalizeIndianMobile(formData.phone)
+    const referrerPhone = normalizeIndianMobile(formData.referrer_phone)
+
+    if (!isValidIndianMobile(customerPhone)) {
+      setMessageType('error')
+      setMessage('Customer mobile number must be a valid Indian number')
+      return
+    }
+
+    if (formData.referrer_phone && !isValidIndianMobile(referrerPhone)) {
+      setMessageType('error')
+      setMessage('Referrer mobile number must be a valid Indian number')
+      return
+    }
+
+    if (referrerPhone && referrerPhone === customerPhone) {
+      setMessageType('error')
+      setMessage('Referrer mobile number cannot be the same as customer mobile number')
       return
     }
 
@@ -93,28 +137,36 @@ export default function Home({
     today.setHours(0, 0, 0, 0)
 
     if (selectedDate <= today) {
+      setMessageType('error')
       setMessage('Please select a future date')
       return
     }
 
-    const { error } = await supabase
-      .from('bookings')
-      .insert([{
-        ...formData,
-        name: formData.name.trim(),
-        phone: formData.phone.trim()
-      }])
+    const { data,error } = await supabase
+      .rpc('create_booking_with_referral',{
+        p_name:formData.name.trim(),
+        p_phone:customerPhone,
+        p_category:formData.category,
+        p_booking_date:formData.booking_date,
+        p_slot:formData.slot,
+        p_referrer_phone:referrerPhone || null
+      })
 
     if (error) {
-      setMessage('Booking failed')
+      setMessageType('error')
+      setMessage(getReadableError(error,'Booking failed'))
     } else {
-      setMessage('Booking successful')
+      setMessageType('success')
+      setMessage(data?.referral_id
+        ? 'Booking successful. Referral created with Pending status.'
+        : 'Booking successful')
       setFormData({
         name: '',
         phone: '',
         category: '',
         booking_date: '',
-        slot: ''
+        slot: '',
+        referrer_phone: ''
       })
     }
   }
@@ -252,62 +304,24 @@ export default function Home({
           <h2 style={styles.sectionTitle}>{content.categories_title}</h2>
           <div style={styles.categoryGrid}>
             {categories.map((item) => (
-              <div
-                key={item.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => setSelectedCategory(item)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    setSelectedCategory(item)
-                  }
-                }}
-                style={styles.categoryCard}
-              >
-                <h3 style={styles.cardTitle}>{item.icon} {item.title}</h3>
-                <p style={styles.mutedText}>{item.description}</p>
-              </div>
+              item.slug ? (
+                <Link
+                  key={item.id}
+                  href={`/${item.slug}`}
+                  style={styles.categoryCard}
+                >
+                  <h3 style={styles.cardTitle}>{item.icon} {item.title}</h3>
+                  <p style={styles.mutedText}>{item.description}</p>
+                </Link>
+              ) : (
+                <div key={item.id} style={styles.categoryCard}>
+                  <h3 style={styles.cardTitle}>{item.icon} {item.title}</h3>
+                  <p style={styles.mutedText}>{item.description}</p>
+                </div>
+              )
             ))}
           </div>
         </section>
-      )}
-
-      {selectedCategory && (
-        <div style={styles.modalOverlay} onClick={() => setSelectedCategory(null)}>
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-label={selectedCategory.popup_title || selectedCategory.title}
-            style={styles.modal}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              type="button"
-              aria-label="Close category details"
-              onClick={() => setSelectedCategory(null)}
-              style={styles.closeButton}
-            >
-              x
-            </button>
-
-            {selectedCategory.popup_image && (
-              <img
-                src={selectedCategory.popup_image}
-                alt={selectedCategory.popup_title || selectedCategory.title}
-                style={styles.modalImage}
-              />
-            )}
-
-            <div style={styles.modalContent}>
-              <h2 style={styles.modalTitle}>
-                {selectedCategory.popup_title || selectedCategory.title}
-              </h2>
-              <p style={styles.modalText}>
-                {selectedCategory.popup_description || selectedCategory.description}
-              </p>
-            </div>
-          </section>
-        </div>
       )}
 
       {hasSteps && (
@@ -406,6 +420,21 @@ export default function Home({
               style={styles.input}
             />
 
+            <input
+              type="text"
+              placeholder="Referred By Mobile Number (optional)"
+              value={formData.referrer_phone}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  referrer_phone: e.target.value.replace(/\D/g, '')
+                })
+              }
+              inputMode="numeric"
+              pattern="[0-9]*"
+              style={styles.input}
+            />
+
             <select
               value={formData.category}
               onChange={(e) =>
@@ -470,7 +499,11 @@ export default function Home({
               Confirm Booking
             </button>
 
-            {message && <p style={styles.formMessage}>{message}</p>}
+            {message && (
+              <p style={messageType === 'error' ? styles.formError : styles.formMessage}>
+                {message}
+              </p>
+            )}
           </div>
         </section>
       )}
@@ -521,6 +554,25 @@ function parseJsonArray(value){
   } catch (_error) {
     return []
   }
+}
+
+function normalizeIndianMobile(value){
+  let digits = String(value || '').replace(/\D/g,'')
+
+  if(digits.length === 12 && digits.startsWith('91')){
+    digits = digits.slice(2)
+  }
+
+  return digits
+}
+
+function isValidIndianMobile(value){
+  return /^[6-9][0-9]{9}$/.test(value)
+}
+
+function getReadableError(error,fallback){
+  const message = error?.message || fallback
+  return message.replace(/^Error:\s*/,'')
 }
 
 function getTomorrowDate(){
@@ -729,7 +781,10 @@ const styles = {
     borderRadius:'18px',
     padding:'24px',
     boxShadow:'0 12px 34px rgba(15,23,42,0.06)',
-    cursor:'pointer'
+    cursor:'pointer',
+    textDecoration:'none',
+    color:'inherit',
+    display:'block'
   },
   timeline:{
     display:'grid',
@@ -860,6 +915,10 @@ const styles = {
   },
   formMessage:{
     color:'#16a34a',
+    fontWeight:800
+  },
+  formError:{
+    color:'#dc2626',
     fontWeight:800
   },
   ctaBanner:{

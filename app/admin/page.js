@@ -223,6 +223,10 @@ export default function Admin(){
         title:newCategory.trim(),
         description:'Consulting service',
         icon:'*',
+        slug:slugify(newCategory),
+        page_title:newCategory.trim(),
+        page_content:'Consulting service',
+        page_image:'',
         popup_title:newCategory.trim(),
         popup_description:'Consulting service',
         popup_image:''
@@ -257,21 +261,25 @@ export default function Admin(){
         title:category.title,
         description:category.description,
         icon:category.icon,
-        popup_title:category.popup_title,
-        popup_description:category.popup_description,
-        popup_image:category.popup_image
+        slug:category.slug,
+        page_title:category.page_title,
+        page_content:category.page_content,
+        page_image:category.page_image,
+        popup_title:category.page_title || category.popup_title,
+        popup_description:category.page_content || category.popup_description,
+        popup_image:category.page_image || category.popup_image
       })
       .eq('id', category.id)
 
     if(error){
       setMessage(`Category update failed: ${error.message}`)
     } else {
-      setMessage('Category popup updated')
+      setMessage('Category landing page updated')
       loadData()
     }
   }
 
-  function uploadCategoryImage(event,category){
+  function uploadCategoryImage(event,category,fieldName){
     const file = event.target.files?.[0]
 
     if(!file){
@@ -291,7 +299,7 @@ export default function Admin(){
     const reader = new FileReader()
 
     reader.onload = ()=>{
-      updateCategoryField(category.id,'popup_image',reader.result)
+      updateCategoryField(category.id,fieldName,reader.result)
       setMessage('Category image ready. Save category to publish it.')
     }
 
@@ -302,8 +310,8 @@ export default function Admin(){
     reader.readAsDataURL(file)
   }
 
-  function removeCategoryImage(categoryId){
-    updateCategoryField(categoryId,'popup_image','')
+  function removeCategoryImage(categoryId,fieldName){
+    updateCategoryField(categoryId,fieldName,'')
     setMessage('Category image removed. Save category to publish it.')
   }
 
@@ -513,6 +521,10 @@ export default function Admin(){
         <div style={styles.headerActions}>
           <Link href="/admin/bookings" style={styles.navButton}>
             View Bookings
+          </Link>
+
+          <Link href="/admin/referrals" style={styles.navButton}>
+            View Referrals
           </Link>
 
           <button
@@ -1197,7 +1209,7 @@ export default function Admin(){
           <div style={styles.cardHeader}>
             <h2 style={styles.cardTitle}>Categories</h2>
             <p style={styles.cardText}>
-              Add consulting service categories.
+              Add consulting categories with dedicated landing pages.
             </p>
           </div>
 
@@ -1285,74 +1297,96 @@ export default function Admin(){
                     }}
                   />
 
-                  <label style={styles.label} htmlFor={`popup-title-${item.id}`}>
-                    Popup title
+                  <label style={styles.label} htmlFor={`category-slug-${item.id}`}>
+                    Landing page URL slug
                   </label>
                   <input
-                    id={`popup-title-${item.id}`}
-                    value={item.popup_title || ''}
+                    id={`category-slug-${item.id}`}
+                    placeholder="career-guidance"
+                    value={item.slug || ''}
                     onChange={(event)=>
                       updateCategoryField(
                         item.id,
-                        'popup_title',
+                        'slug',
+                        slugify(event.target.value)
+                      )
+                    }
+                    style={styles.input}
+                  />
+                  {item.slug && (
+                    <p style={styles.slugPreview}>
+                      Public page: /{item.slug}
+                    </p>
+                  )}
+
+                  <label style={styles.label} htmlFor={`page-title-${item.id}`}>
+                    Landing page title
+                  </label>
+                  <input
+                    id={`page-title-${item.id}`}
+                    value={item.page_title || ''}
+                    onChange={(event)=>
+                      updateCategoryField(
+                        item.id,
+                        'page_title',
                         event.target.value
                       )
                     }
                     style={styles.input}
                   />
 
-                  <label style={styles.label} htmlFor={`popup-description-${item.id}`}>
-                    Popup text
+                  <label style={styles.label} htmlFor={`page-content-${item.id}`}>
+                    Landing page text
                   </label>
                   <textarea
-                    id={`popup-description-${item.id}`}
-                    value={item.popup_description || ''}
+                    id={`page-content-${item.id}`}
+                    value={item.page_content || ''}
                     onChange={(event)=>
                       updateCategoryField(
                         item.id,
-                        'popup_description',
+                        'page_content',
                         event.target.value
                       )
                     }
                     style={{
                       ...styles.input,
-                      minHeight:'120px',
+                      minHeight:'140px',
                       resize:'vertical'
                     }}
                   />
 
-                  <label style={styles.label} htmlFor={`popup-image-${item.id}`}>
-                    Popup image
+                  <label style={styles.label} htmlFor={`page-image-${item.id}`}>
+                    Landing page image
                   </label>
-                  <label htmlFor={`popup-image-${item.id}`} style={styles.uploadBox}>
+                  <label htmlFor={`page-image-${item.id}`} style={styles.uploadBox}>
                     <span style={styles.uploadTitle}>
-                      Upload popup image
+                      Upload landing page image
                     </span>
                     <span style={styles.uploadText}>
                       JPG, PNG, or WebP under 2MB
                     </span>
                   </label>
                   <input
-                    id={`popup-image-${item.id}`}
+                    id={`page-image-${item.id}`}
                     type="file"
                     accept="image/*"
-                    onChange={(event)=>uploadCategoryImage(event,item)}
+                    onChange={(event)=>uploadCategoryImage(event,item,'page_image')}
                     style={styles.fileInput}
                   />
 
-                  {item.popup_image && (
+                  {item.page_image && (
                     <div style={styles.previewWrap}>
                       <img
-                        src={item.popup_image}
-                        alt={`${item.title} popup preview`}
+                        src={item.page_image}
+                        alt={`${item.title} landing page preview`}
                         style={styles.previewImage}
                       />
                       <button
                         type="button"
-                        onClick={()=>removeCategoryImage(item.id)}
+                        onClick={()=>removeCategoryImage(item.id,'page_image')}
                         style={styles.secondaryButton}
                       >
-                        Remove Popup Image
+                        Remove Landing Page Image
                       </button>
                     </div>
                   )}
@@ -1502,6 +1536,14 @@ export default function Admin(){
       )}
     </main>
   )
+}
+
+function slugify(value){
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,'-')
+    .replace(/^-+|-+$/g,'')
 }
 
 function JsonField({ id,label,value,onChange }){
@@ -1811,6 +1853,12 @@ const styles = {
     background:'#dbeafe',
     color:'#1d4ed8',
     fontWeight:900
+  },
+  slugPreview:{
+    margin:'-8px 0 16px',
+    color:'#64748b',
+    fontSize:'13px',
+    fontWeight:700
   },
   emptyText:{
     color:'#64748b',
