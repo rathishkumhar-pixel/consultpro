@@ -2,8 +2,8 @@
 import './globals.css'
 
 export const metadata = {
-  title:'ConsultPro Mobile First',
-  description:'Consulting Platform'
+  title:'Kashv Consultancy',
+  description:'Expert advice before your big decisions'
 }
 
 export default function RootLayout({children}){

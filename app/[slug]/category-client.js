@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import BrandLogo from '../components/Logo'
 
 export default function CategoryPageClient({ category }){
   const pageTitle = category.page_title || category.title
@@ -14,6 +15,12 @@ export default function CategoryPageClient({ category }){
 
   return(
     <main style={styles.page}>
+      <header style={styles.topbar}>
+        <Link href="/" style={styles.brandLink}>
+          <BrandLogo size={34} />
+        </Link>
+      </header>
+
       <section style={styles.hero}>
         <Link href="/" style={styles.backLink}>
           Back to Home
@@ -68,30 +75,39 @@ const styles = {
   page:{
     minHeight:'100vh',
     padding:'20px',
-    background:'#f5f7fb',
+    background:'#0f2138',
     fontFamily:'Arial,sans-serif'
+  },
+  topbar:{
+    maxWidth:'980px',
+    margin:'0 auto',
+    padding:'8px 0 0'
+  },
+  brandLink:{
+    textDecoration:'none'
   },
   hero:{
     maxWidth:'980px',
     margin:'0 auto',
-    padding:'48px 0 24px'
+    padding:'40px 0 24px'
   },
   backLink:{
     display:'inline-flex',
     marginBottom:'28px',
-    color:'#2563eb',
+    color:'#f2643c',
     textDecoration:'none',
     fontWeight:700
   },
   eyebrow:{
-    color:'#2563eb',
+    color:'#f2643c',
     fontSize:'14px',
     fontWeight:800,
     textTransform:'uppercase',
+    letterSpacing:'2px',
     marginBottom:'10px'
   },
   title:{
-    color:'#111827',
+    color:'#f5f1e6',
     fontSize:'clamp(34px,6vw,58px)',
     lineHeight:1.05
   },
@@ -111,9 +127,9 @@ const styles = {
     aspectRatio:'16 / 10',
     objectFit:'cover',
     borderRadius:'22px',
-    border:'1px solid #e5e7eb',
-    boxShadow:'0 18px 50px rgba(15,23,42,0.10)',
-    background:'#e5e7eb'
+    border:'1px solid rgba(245,241,230,0.1)',
+    boxShadow:'0 18px 50px rgba(0,0,0,0.3)',
+    background:'#16304d'
   },
   textWrap:{
     display:'grid',
@@ -121,7 +137,7 @@ const styles = {
     padding:'8px 0'
   },
   paragraph:{
-    color:'#334155',
+    color:'#d7dee8',
     fontSize:'17px',
     lineHeight:1.75,
     whiteSpace:'pre-wrap'
@@ -135,7 +151,7 @@ const styles = {
     padding:'0 22px',
     marginTop:'8px',
     borderRadius:'12px',
-    background:'#2563eb',
+    background:'#f2643c',
     color:'#ffffff',
     fontWeight:800,
     textDecoration:'none'
@@ -145,13 +161,14 @@ const styles = {
     margin:'56px auto 0',
     padding:'24px',
     borderRadius:'18px',
-    background:'#111827',
-    color:'#ffffff',
+    background:'#0a1a2c',
+    color:'#f5f1e6',
     display:'flex',
     alignItems:'center',
     justifyContent:'space-between',
     gap:'16px',
-    flexWrap:'wrap'
+    flexWrap:'wrap',
+    border:'1px solid rgba(245,241,230,0.1)'
   },
   footerLinks:{
     display:'flex',
@@ -159,7 +176,7 @@ const styles = {
     flexWrap:'wrap'
   },
   footerLink:{
-    color:'#ffffff',
+    color:'#f5f1e6',
     textDecoration:'none',
     fontWeight:700
   }

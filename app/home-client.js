@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '../lib/supabase'
+import BrandLogo from './components/Logo'
 
 export default function Home({
   initialContent = null,
@@ -202,6 +203,15 @@ export default function Home({
 
   return (
     <main style={styles.page}>
+      <header style={styles.topbar}>
+        <Link href="/" style={styles.brandLink}>
+          <BrandLogo size={34} />
+        </Link>
+        <Link href="/contact" style={styles.topbarLink}>
+          Contact
+        </Link>
+      </header>
+
       {hasHero && (
         <section style={styles.hero}>
           <div style={styles.heroCopy}>
@@ -589,10 +599,30 @@ function getTomorrowDate(){
 const styles = {
   page:{
     minHeight:'100vh',
-    background:'#f5f7fb',
+    background:'#0f2138',
     padding:'clamp(16px,3vw,32px)',
     fontFamily:'Arial,sans-serif',
-    color:'#111827'
+    color:'#f5f1e6'
+  },
+  topbar:{
+    maxWidth:'1240px',
+    margin:'0 auto',
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'space-between',
+    padding:'8px 0 4px'
+  },
+  brandLink:{
+    textDecoration:'none'
+  },
+  topbarLink:{
+    color:'#f5f1e6',
+    textDecoration:'none',
+    fontWeight:700,
+    fontSize:'15px',
+    border:'1px solid rgba(245,241,230,0.25)',
+    borderRadius:'10px',
+    padding:'10px 16px'
   },
   hero:{
     minHeight:'calc(100vh - 64px)',
@@ -609,20 +639,21 @@ const styles = {
     alignSelf:'center'
   },
   eyebrow:{
-    color:'#2563eb',
+    color:'#f2643c',
     fontSize:'13px',
     fontWeight:800,
     textTransform:'uppercase',
+    letterSpacing:'2px',
     marginBottom:'12px'
   },
   heroTitle:{
     fontSize:'clamp(42px,5.5vw,78px)',
     lineHeight:1.05,
     marginBottom:'20px',
-    color:'#0f172a'
+    color:'#f5f1e6'
   },
   heroText:{
-    color:'#475569',
+    color:'#93a5bd',
     fontSize:'clamp(17px,2vw,20px)',
     lineHeight:1.7,
     marginBottom:'28px',
@@ -639,7 +670,7 @@ const styles = {
     padding:'0 20px',
     border:'none',
     borderRadius:'12px',
-    background:'#2563eb',
+    background:'#f2643c',
     color:'#ffffff',
     fontSize:'15px',
     fontWeight:800,
@@ -648,10 +679,10 @@ const styles = {
   secondaryButton:{
     minHeight:'48px',
     padding:'0 20px',
-    border:'1px solid #cbd5e1',
+    border:'1px solid rgba(245,241,230,0.3)',
     borderRadius:'12px',
-    background:'#ffffff',
-    color:'#0f172a',
+    background:'transparent',
+    color:'#f5f1e6',
     fontSize:'15px',
     fontWeight:800,
     cursor:'pointer'
@@ -669,9 +700,9 @@ const styles = {
     alignItems:'center',
     padding:'12px 14px',
     borderRadius:'12px',
-    background:'#ffffff',
-    border:'1px solid #e5e7eb',
-    color:'#334155',
+    background:'#16304d',
+    border:'1px solid rgba(245,241,230,0.12)',
+    color:'#f5f1e6',
     fontSize:'14px',
     fontWeight:800
   },
@@ -688,7 +719,7 @@ const styles = {
     aspectRatio:'16 / 11',
     objectFit:'cover',
     borderRadius:'28px',
-    boxShadow:'0 30px 90px rgba(15,23,42,0.20)'
+    boxShadow:'0 30px 90px rgba(0,0,0,0.45)'
   },
   section:{
     maxWidth:'1180px',
@@ -698,7 +729,7 @@ const styles = {
   sectionTitle:{
     fontSize:'clamp(30px,4vw,46px)',
     lineHeight:1.08,
-    color:'#0f172a',
+    color:'#f5f1e6',
     marginBottom:'24px'
   },
   featureGrid:{
@@ -707,20 +738,20 @@ const styles = {
     gap:'18px'
   },
   featureCard:{
-    background:'#ffffff',
-    border:'1px solid #e5e7eb',
+    background:'#16304d',
+    border:'1px solid rgba(245,241,230,0.1)',
     borderRadius:'18px',
     padding:'24px',
-    boxShadow:'0 12px 34px rgba(15,23,42,0.06)'
+    boxShadow:'0 12px 34px rgba(0,0,0,0.25)'
   },
   cardTitle:{
     fontSize:'20px',
     lineHeight:1.25,
-    color:'#0f172a',
+    color:'#f5f1e6',
     marginBottom:'10px'
   },
   mutedText:{
-    color:'#64748b',
+    color:'#93a5bd',
     fontSize:'15px',
     lineHeight:1.65
   },
@@ -733,11 +764,11 @@ const styles = {
     minHeight:'250px',
     display:'flex',
     flexDirection:'column',
-    background:'#ffffff',
-    border:'1px solid #e5e7eb',
+    background:'#16304d',
+    border:'1px solid rgba(245,241,230,0.1)',
     borderRadius:'18px',
     padding:'24px',
-    boxShadow:'0 12px 34px rgba(15,23,42,0.06)'
+    boxShadow:'0 12px 34px rgba(0,0,0,0.25)'
   },
   serviceIcon:{
     width:'46px',
@@ -746,8 +777,8 @@ const styles = {
     alignItems:'center',
     justifyContent:'center',
     borderRadius:'14px',
-    background:'#dbeafe',
-    color:'#1d4ed8',
+    background:'rgba(242,100,60,0.16)',
+    color:'#f2643c',
     fontSize:'15px',
     fontWeight:900,
     marginBottom:'16px'
@@ -758,15 +789,15 @@ const styles = {
     objectFit:'cover',
     borderRadius:'14px',
     marginBottom:'18px',
-    background:'#e5e7eb'
+    background:'#0a1a2c'
   },
   cardButton:{
     marginTop:'auto',
     minHeight:'44px',
     border:'none',
     borderRadius:'12px',
-    background:'#eff6ff',
-    color:'#1d4ed8',
+    background:'rgba(242,100,60,0.16)',
+    color:'#f2643c',
     fontWeight:800,
     cursor:'pointer'
   },
@@ -776,11 +807,11 @@ const styles = {
     gap:'18px'
   },
   categoryCard:{
-    background:'#ffffff',
-    border:'1px solid #e5e7eb',
+    background:'#16304d',
+    border:'1px solid rgba(245,241,230,0.1)',
     borderRadius:'18px',
     padding:'24px',
-    boxShadow:'0 12px 34px rgba(15,23,42,0.06)',
+    boxShadow:'0 12px 34px rgba(0,0,0,0.25)',
     cursor:'pointer',
     textDecoration:'none',
     color:'inherit',
@@ -794,12 +825,13 @@ const styles = {
   stepCard:{
     padding:'22px',
     borderRadius:'18px',
-    background:'#0f172a',
-    color:'#ffffff'
+    background:'#0a1a2c',
+    color:'#f5f1e6',
+    border:'1px solid rgba(245,241,230,0.1)'
   },
   stepLabel:{
     display:'block',
-    color:'#93c5fd',
+    color:'#f2643c',
     fontSize:'13px',
     fontWeight:800,
     marginBottom:'10px'
@@ -819,31 +851,31 @@ const styles = {
   },
   testimonialCard:{
     scrollSnapAlign:'start',
-    background:'#ffffff',
-    border:'1px solid #e5e7eb',
+    background:'#16304d',
+    border:'1px solid rgba(245,241,230,0.1)',
     borderRadius:'18px',
     padding:'24px',
-    boxShadow:'0 12px 34px rgba(15,23,42,0.06)'
+    boxShadow:'0 12px 34px rgba(0,0,0,0.25)'
   },
   rating:{
-    color:'#f59e0b',
+    color:'#f2643c',
     fontSize:'18px',
     marginBottom:'14px'
   },
   reviewText:{
-    color:'#334155',
+    color:'#d7dee8',
     fontSize:'16px',
     lineHeight:1.7,
     marginBottom:'18px'
   },
   customerName:{
     display:'block',
-    color:'#0f172a',
+    color:'#f5f1e6',
     fontSize:'16px',
     marginBottom:'4px'
   },
   location:{
-    color:'#64748b',
+    color:'#93a5bd',
     fontSize:'14px'
   },
   accordion:{
@@ -851,8 +883,8 @@ const styles = {
     gap:'12px'
   },
   faqItem:{
-    background:'#ffffff',
-    border:'1px solid #e5e7eb',
+    background:'#16304d',
+    border:'1px solid rgba(245,241,230,0.1)',
     borderRadius:'16px',
     overflow:'hidden'
   },
@@ -864,15 +896,15 @@ const styles = {
     gap:'16px',
     padding:'18px',
     border:'none',
-    background:'#ffffff',
-    color:'#0f172a',
+    background:'transparent',
+    color:'#f5f1e6',
     fontSize:'16px',
     fontWeight:800,
     textAlign:'left',
     cursor:'pointer'
   },
   faqAnswer:{
-    color:'#64748b',
+    color:'#93a5bd',
     fontSize:'15px',
     lineHeight:1.7,
     padding:'0 18px 18px'
@@ -884,11 +916,11 @@ const styles = {
     gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,320px),1fr))',
     gap:'clamp(28px,4vw,48px)',
     alignItems:'start',
-    background:'#ffffff',
+    background:'#16304d',
     padding:'32px',
     borderRadius:'22px',
-    border:'1px solid #e5e7eb',
-    boxShadow:'0 18px 50px rgba(15,23,42,0.08)'
+    border:'1px solid rgba(245,241,230,0.1)',
+    boxShadow:'0 18px 50px rgba(0,0,0,0.3)'
   },
   formGrid:{
     display:'grid',
@@ -899,26 +931,27 @@ const styles = {
     minHeight:'48px',
     padding:'12px 14px',
     borderRadius:'12px',
-    border:'1px solid #d1d5db',
+    border:'1px solid rgba(245,241,230,0.2)',
     fontSize:'15px',
-    background:'#ffffff'
+    background:'#0f2138',
+    color:'#f5f1e6'
   },
   formButton:{
     minHeight:'50px',
     border:'none',
     borderRadius:'12px',
-    background:'#2563eb',
+    background:'#f2643c',
     color:'#ffffff',
     cursor:'pointer',
     fontSize:'16px',
     fontWeight:800
   },
   formMessage:{
-    color:'#16a34a',
+    color:'#4ade80',
     fontWeight:800
   },
   formError:{
-    color:'#dc2626',
+    color:'#f87171',
     fontWeight:800
   },
   ctaBanner:{
@@ -926,7 +959,7 @@ const styles = {
     margin:'56px auto 0',
     padding:'44px 28px',
     borderRadius:'24px',
-    background:'#111827',
+    background:'#f2643c',
     color:'#ffffff',
     textAlign:'center'
   },
@@ -938,7 +971,7 @@ const styles = {
   ctaText:{
     maxWidth:'680px',
     margin:'0 auto 24px',
-    color:'#d1d5db',
+    color:'rgba(255,255,255,0.9)',
     fontSize:'18px',
     lineHeight:1.6
   },
@@ -947,8 +980,8 @@ const styles = {
     padding:'0 22px',
     border:'none',
     borderRadius:'12px',
-    background:'#ffffff',
-    color:'#111827',
+    background:'#0f2138',
+    color:'#f5f1e6',
     fontSize:'16px',
     fontWeight:900,
     cursor:'pointer'
@@ -958,14 +991,14 @@ const styles = {
     margin:'56px auto 0',
     padding:'24px',
     borderRadius:'18px',
-    background:'#ffffff',
-    color:'#111827',
+    background:'#0a1a2c',
+    color:'#f5f1e6',
     display:'flex',
     alignItems:'center',
     justifyContent:'space-between',
     gap:'18px',
     flexWrap:'wrap',
-    border:'1px solid #e5e7eb'
+    border:'1px solid rgba(245,241,230,0.1)'
   },
   footerBrand:{
     display:'block',
@@ -973,14 +1006,14 @@ const styles = {
     marginBottom:'6px'
   },
   footerText:{
-    color:'#64748b',
+    color:'#93a5bd',
     fontSize:'14px',
     lineHeight:1.5
   },
   footerLink:{
-    color:'#111827',
+    color:'#f5f1e6',
     textDecoration:'none',
-    border:'1px solid #d1d5db',
+    border:'1px solid rgba(245,241,230,0.25)',
     borderRadius:'12px',
     padding:'12px 16px',
     fontWeight:800
@@ -993,7 +1026,7 @@ const styles = {
     alignItems:'center',
     justifyContent:'center',
     padding:'20px',
-    background:'rgba(15,23,42,0.62)'
+    background:'rgba(10,26,44,0.75)'
   },
   modal:{
     position:'relative',
@@ -1001,9 +1034,9 @@ const styles = {
     maxWidth:'560px',
     maxHeight:'88vh',
     overflow:'auto',
-    background:'#ffffff',
+    background:'#16304d',
     borderRadius:'18px',
-    boxShadow:'0 28px 80px rgba(15,23,42,0.28)'
+    boxShadow:'0 28px 80px rgba(0,0,0,0.4)'
   },
   closeButton:{
     position:'absolute',
@@ -1014,30 +1047,30 @@ const styles = {
     height:'40px',
     border:'none',
     borderRadius:'999px',
-    background:'#ffffff',
-    color:'#111827',
+    background:'#f5f1e6',
+    color:'#0f2138',
     fontSize:'22px',
     lineHeight:1,
     cursor:'pointer',
-    boxShadow:'0 8px 24px rgba(15,23,42,0.16)'
+    boxShadow:'0 8px 24px rgba(0,0,0,0.3)'
   },
   modalImage:{
     width:'100%',
     aspectRatio:'16 / 9',
     objectFit:'cover',
-    background:'#e5e7eb'
+    background:'#0a1a2c'
   },
   modalContent:{
     padding:'24px'
   },
   modalTitle:{
-    color:'#111827',
+    color:'#f5f1e6',
     fontSize:'28px',
     lineHeight:1.2,
     marginBottom:'12px'
   },
   modalText:{
-    color:'#4b5563',
+    color:'#93a5bd',
     fontSize:'16px',
     lineHeight:1.7,
     whiteSpace:'pre-wrap'

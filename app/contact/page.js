@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '../../lib/supabase'
+import BrandLogo from '../components/Logo'
 
 export default function ContactPage(){
   const [content,setContent] = useState(null)
@@ -23,6 +24,12 @@ export default function ContactPage(){
 
   return(
     <main style={styles.page}>
+      <header style={styles.topbar}>
+        <Link href="/" style={styles.brandLink}>
+          <BrandLogo size={34} />
+        </Link>
+      </header>
+
       <section style={styles.hero}>
         <Link href="/" style={styles.backLink}>
           Back to Home
@@ -30,7 +37,7 @@ export default function ContactPage(){
 
         <p style={styles.eyebrow}>Contact us</p>
         <h1 style={styles.title}>
-          {content?.contact_title || 'Talk to ConsultPro'}
+          {content?.contact_title || 'Talk to Kashv Consultancy'}
         </h1>
         <p style={styles.description}>
           {content?.contact_description ||
@@ -75,7 +82,7 @@ export default function ContactPage(){
       </section>
 
       <footer style={styles.footer}>
-        <strong>ConsultPro</strong>
+        <strong>Kashv Consultancy</strong>
         <Link href="/" style={styles.footerLink}>
           Home
         </Link>
@@ -88,37 +95,46 @@ const styles = {
   page:{
     minHeight:'100vh',
     padding:'20px',
-    background:'#f5f7fb',
+    background:'#0f2138',
     fontFamily:'Arial,sans-serif'
+  },
+  topbar:{
+    maxWidth:'900px',
+    margin:'0 auto',
+    padding:'8px 0 0'
+  },
+  brandLink:{
+    textDecoration:'none'
   },
   hero:{
     maxWidth:'900px',
     margin:'0 auto',
-    padding:'58px 0 32px'
+    padding:'40px 0 32px'
   },
   backLink:{
     display:'inline-flex',
     marginBottom:'28px',
-    color:'#2563eb',
+    color:'#f2643c',
     textDecoration:'none',
     fontWeight:700
   },
   eyebrow:{
-    color:'#2563eb',
+    color:'#f2643c',
     fontSize:'14px',
     fontWeight:800,
     textTransform:'uppercase',
+    letterSpacing:'2px',
     marginBottom:'10px'
   },
   title:{
-    color:'#111827',
+    color:'#f5f1e6',
     fontSize:'clamp(34px,6vw,58px)',
     lineHeight:1.05,
     marginBottom:'18px'
   },
   description:{
     maxWidth:'720px',
-    color:'#4b5563',
+    color:'#93a5bd',
     fontSize:'18px',
     lineHeight:1.7
   },
@@ -133,20 +149,20 @@ const styles = {
     minHeight:'150px',
     padding:'22px',
     borderRadius:'18px',
-    background:'#ffffff',
-    border:'1px solid #e5e7eb',
-    boxShadow:'0 2px 12px rgba(0,0,0,0.05)'
+    background:'#16304d',
+    border:'1px solid rgba(245,241,230,0.1)',
+    boxShadow:'0 12px 34px rgba(0,0,0,0.25)'
   },
   label:{
     display:'block',
-    color:'#6b7280',
+    color:'#93a5bd',
     fontSize:'13px',
     fontWeight:800,
     textTransform:'uppercase',
     marginBottom:'14px'
   },
   value:{
-    color:'#111827',
+    color:'#f5f1e6',
     fontSize:'18px',
     lineHeight:1.5,
     fontWeight:700,
@@ -158,15 +174,16 @@ const styles = {
     margin:'56px auto 0',
     padding:'24px',
     borderRadius:'18px',
-    background:'#111827',
-    color:'#ffffff',
+    background:'#0a1a2c',
+    color:'#f5f1e6',
     display:'flex',
     alignItems:'center',
     justifyContent:'space-between',
-    gap:'16px'
+    gap:'16px',
+    border:'1px solid rgba(245,241,230,0.1)'
   },
   footerLink:{
-    color:'#ffffff',
+    color:'#f5f1e6',
     textDecoration:'none',
     fontWeight:700
   }

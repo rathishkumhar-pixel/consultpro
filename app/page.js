@@ -2,10 +2,10 @@ import HomeClient from './home-client'
 
 export async function generateMetadata(){
   const content = await getSeoContent()
-  const title = content?.seo_title || 'RV Consulting'
+  const title = content?.seo_title || 'Kashv Consultancy'
   const description =
     content?.seo_description ||
-    'Get practical consulting advice from experienced professionals before making important decisions.'
+    'Expert advice before your big decisions.'
   const ogImage = content?.seo_og_image
 
   return {
